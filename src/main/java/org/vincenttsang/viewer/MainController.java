@@ -63,9 +63,10 @@ public class MainController {
                 TreeItem node = dirsTree.getSelectionModel().getSelectedItem();
                 PathItem item = (PathItem) node.getValue();
                 System.out.println("Node click: " + item.getDirName());
+                File[] filesList = new File[0];
                 if (item.getFile().isDirectory()) {
                     node.getChildren().clear();
-                    File[] filesList = item.getFile().listFiles();
+                    filesList = item.getFile().listFiles();
                     if (filesList == null || filesList.length == 0) {
                         System.out.println("this is an empty directory.");
                     } else {
@@ -79,6 +80,7 @@ public class MainController {
                         }
                     }
                 } else {
+                    System.out.println(item.getFile().toPath());
                     System.out.println("this is not a directory.");
                 }
             }

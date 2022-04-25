@@ -15,6 +15,7 @@ public class PathItem {
         if(name.equals("")) {
             name = "根目录:  /";
         }
+        //System.out.println(mFile.toPath());
         mDirName = new SimpleStringProperty(name);
         if (mFile.isDirectory()) {
             mDirSize = new SimpleStringProperty("");
