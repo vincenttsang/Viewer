@@ -1,20 +1,29 @@
 package org.vincenttsang.viewer;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.css.Style;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class MainController {
     @FXML
     private TreeTableView<PathItem> dirsTree;
+    @FXML
+    private ListView ImgList;
+
+    public ViewerImageItem ImgItem;
 
     public void initialize() {
+        ImgItem = new ViewerImageItem();
         initDirsTree();
     }
 
@@ -63,27 +72,41 @@ public class MainController {
                 TreeItem node = dirsTree.getSelectionModel().getSelectedItem();
                 PathItem item = (PathItem) node.getValue();
                 System.out.println("Node click: " + item.getDirName());
-                File[] filesList = new File[0];
+                File[] filesList;
                 if (item.getFile().isDirectory()) {
                     node.getChildren().clear();
                     filesList = item.getFile().listFiles();
                     if (filesList == null || filesList.length == 0) {
                         System.out.println("this is an empty directory.");
                     } else {
-                        for (File s : filesList) {
-                            PathItem nextDirUnit = new PathItem(s.getAbsolutePath());
+                        Arrays.stream(filesList).map(s -> new PathItem(s.getAbsolutePath())).forEachOrdered(nextDirUnit -> {
                             TreeItem nextDirItem = new TreeItem<>(nextDirUnit);
-                            if (nextDirUnit.getFile().isDirectory() && nextDirUnit.getFile().list() != null && nextDirUnit.getFile().list().length > 0) { //如果当前添加的叶子文件是飞空文件夹，则添加一个空数据作为叶子的叶子，使得用户看到这个文件夹时知道可以继续点击
-                                nextDirItem.getChildren().add(new TreeItem<>());
+                            if (nextDirUnit.getFile().isDirectory() && nextDirUnit.getFile().list() != null && Objects.requireNonNull(nextDirUnit.getFile().list()).length > 0) { //如果当前添加的叶子文件是非空文件夹，则添加一个空数据作为叶子的叶子，使得用户看到这个文件夹时知道可以继续点击
+                                nextDirItem.getChildren().add(new TreeItem<>(new PathItem(" ")));
                             }
                             node.getChildren().add(nextDirItem);
-                        }
+                        });
                     }
                 } else {
-                    System.out.println(item.getFile().toPath());
-                    System.out.println("this is not a directory.");
+                    ImgItem.setImageFile(item.getFile());
+                    System.out.println(ImgItem.getImageUrl());
+                    addImg(ImgItem);
+                    System.out.println("this a file.");
                 }
             }
         });
+    }
+
+    public void addImg(ViewerImageItem imgItem) {
+        Image image = new Image(imgItem.getImageUrl(),
+                350, // requested width
+                350, // requested height
+                true, // preserve ratio
+                true, // smooth rescaling
+                false // load in background
+        );
+        ImageView imageView = new ImageView();
+        imageView.setImage(image);
+        ImgList.getItems().add(imageView);
     }
 }
