@@ -12,7 +12,7 @@ public class PathItem {
     public PathItem(String path) {
         mFile = new File(path);
         String name = mFile.getName();
-        if(name.equals("")) {
+        if (name.equals("")) {
             name = "根目录:  /";
         }
         //System.out.println(mFile.toPath());

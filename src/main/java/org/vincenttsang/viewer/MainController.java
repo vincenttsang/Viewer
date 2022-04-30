@@ -1,7 +1,6 @@
 package org.vincenttsang.viewer;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.css.Style;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -9,30 +8,40 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import org.apache.sanselan.ImageReadException;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.Objects;
 
 public class MainController {
+    public ViewerImageItem ImgItem;
     @FXML
     private TreeTableView<PathItem> dirsTree;
     @FXML
     private ListView ImgList;
     @FXML
     private Label infoLabel;
-    @FXML public void clickOnImage(MouseEvent arg0) {
+    private String clickedImgUrl;
+
+    @FXML
+    public void clickOnImage(MouseEvent arg0) throws MalformedURLException, URISyntaxException {
         System.out.println("你点击了 " + ImgList.getSelectionModel().getSelectedItem());
         ImageView imgView = (ImageView) ImgList.getSelectionModel().getSelectedItem();
         clickedImgUrl = imgView.getId();
+        ViewerImageItem tmpImgItem = new ViewerImageItem();
+        tmpImgItem.setImageFile(new File(new URL(clickedImgUrl).toURI()));
+        infoLabel.setText(tmpImgItem.getImageInfo());
+        infoLabel.setWrapText(true);
     }
-    @FXML public void clickOnOpenBtn(MouseEvent arg0) {
-        if(clickedImgUrl != null) {
+
+    @FXML
+    public void clickOnOpenBtn(MouseEvent arg0) {
+        if (clickedImgUrl != null) {
             System.out.println("打开图片" + clickedImgUrl);
             Stage secondStage = new Stage();
             Label label = new Label("新窗口"); // 放一个标签
@@ -54,11 +63,12 @@ public class MainController {
             System.out.println("未选中任何图片");
         }
     }
-    public ViewerImageItem ImgItem;
-    private String clickedImgUrl;
+
     public void initialize() {
         ImgItem = new ViewerImageItem();
         initDirsTree();
+        infoLabel.setText("请选择一张图片");
+        infoLabel.setWrapText(true);
     }
 
     public void initDirsTree() {
@@ -68,7 +78,7 @@ public class MainController {
         dirsColumn.setCellValueFactory(
                 (TreeTableColumn.CellDataFeatures<PathItem, String> param) -> {
                     ReadOnlyStringWrapper stringWrapper = new ReadOnlyStringWrapper("");
-                    if(param.getValue().getValue() != null) {
+                    if (param.getValue().getValue() != null) {
                         stringWrapper = new ReadOnlyStringWrapper(param.getValue().getValue().getDirName());
                         return stringWrapper;
                     } else {
@@ -83,7 +93,7 @@ public class MainController {
         sizeColumn.setCellValueFactory(
                 (TreeTableColumn.CellDataFeatures<PathItem, String> param) -> {
                     ReadOnlyStringWrapper stringWrapper = new ReadOnlyStringWrapper("");
-                    if(param.getValue().getValue() != null) {
+                    if (param.getValue().getValue() != null) {
                         stringWrapper = new ReadOnlyStringWrapper(param.getValue().getValue().getDirSize());
                         return stringWrapper;
                     } else {
@@ -132,12 +142,9 @@ public class MainController {
     public void addImgFromFile(File file) {
         ImgItem.setImageFile(file);
         System.out.println(ImgItem.getImageUrl());
-        if(ImgItem.isImgFile()) {
+        if (ImgItem.isImgFile()) {
             addImg(ImgItem);
-            infoLabel.setText(ImgItem.getImageInfo());
-            infoLabel.setWrapText(true);
-        }
-        else {
+        } else {
             System.out.println("该文件不是图片文件");
         }
     }

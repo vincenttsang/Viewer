@@ -1,14 +1,12 @@
 package org.vincenttsang.viewer;
 
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-
-import javafx.geometry.Dimension2D;
 import org.apache.sanselan.ImageInfo;
 import org.apache.sanselan.ImageReadException;
 import org.apache.sanselan.Sanselan;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 
 public class ViewerImageItem {
     private File imageFile;
@@ -27,7 +25,7 @@ public class ViewerImageItem {
 
     public void setImageFile(File imageFile) {
         this.imageFile = imageFile;
-        if(isImgFile()) {
+        if (isImgFile()) {
             try {
                 this.setImageInfo();
             } catch (IOException e) {
@@ -35,8 +33,7 @@ public class ViewerImageItem {
             } catch (ImageReadException e) {
                 throw new RuntimeException(e);
             }
-        }
-        else {
+        } else {
             this.imageInfoString = "该文件非图片文件";
         }
         System.out.println(this.imageInfoString);
