@@ -36,7 +36,7 @@ public class ViewerImageItem {
         } else {
             this.imageInfoString = "该文件非图片文件";
         }
-        System.out.println(this.imageInfoString);
+        //System.out.println(this.imageInfoString);
     }
 
     public String getImageName() {
@@ -53,12 +53,23 @@ public class ViewerImageItem {
 
     public void setImageInfo() throws IOException, ImageReadException {
         ImageInfo imageInfo = Sanselan.getImageInfo(imageFile);
-        this.imageInfoString = "图片颜色类型：" + imageInfo.getColorTypeDescription();
+        this.imageInfoString = "文件名：" + imageFile.getName();
+        this.imageInfoString += "\n图片颜色类型：" + imageInfo.getColorTypeDescription();
         this.imageInfoString += "\n图片文件格式：" + imageInfo.getFormatName();
         this.imageInfoString += "\n图片文件格式(根据Magic Number)：" + Sanselan.guessFormat(imageFile);
         this.imageInfoString += "\n图片Mime信息：" + imageInfo.getMimeType();
         var imageSize = Sanselan.getImageSize(imageFile);
         this.imageInfoString += "\n图片尺寸：" + imageSize.getWidth() + "*" + imageSize.getHeight();
+    }
+
+    public Double getImageWidth() throws IOException, ImageReadException {
+        var imageSize = Sanselan.getImageSize(imageFile);
+        return imageSize.getWidth();
+    }
+
+    public Double getImageHeight() throws IOException, ImageReadException {
+        var imageSize = Sanselan.getImageSize(imageFile);
+        return imageSize.getHeight();
     }
 
     public String getImageUrl() {
