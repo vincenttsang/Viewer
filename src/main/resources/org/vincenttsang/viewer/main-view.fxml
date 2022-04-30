@@ -117,7 +117,7 @@
             <AnchorPane id="Content" minHeight="-1.0" minWidth="-1.0" prefHeight="545.0" prefWidth="430.0">
               <children>
                 <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="预览" textAlignment="CENTER" textFill="$x2" wrapText="false" />
-                        <ListView layoutX="7.0" layoutY="37.0" prefHeight="574.0" prefWidth="416.0" fx:id="ImgList"/>
+                        <ListView fx:id="ImgList" layoutX="7.0" layoutY="37.0" prefHeight="574.0" prefWidth="416.0" onMouseClicked="#clickOnImage" />
               </children>
             </AnchorPane>
           </content>
@@ -125,7 +125,11 @@
         <AnchorPane>
           <children>
             <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="图片信息" textAlignment="CENTER" textFill="$x2" wrapText="false" />
-                  <Button layoutX="18.0" layoutY="395.0" mnemonicParsing="false" text="打开" />
+                  <Button layoutX="22.0" layoutY="465.0" mnemonicParsing="false" text="打开" onMouseClicked="#clickOnOpenBtn" />
+                  <Button layoutX="22.0" layoutY="501.0" mnemonicParsing="false" text="删除" />
+                  <Button layoutX="22.0" layoutY="538.0" mnemonicParsing="false" text="复制" />
+                  <Button layoutX="22.0" layoutY="576.0" mnemonicParsing="false" text="重命名" />
+                  <Label alignment="TOP_LEFT" fx:id="infoLabel" layoutX="10.0" layoutY="45.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="405.0" prefWidth="198.0" text="详细信息" />
           </children>
         </AnchorPane>
       </items>

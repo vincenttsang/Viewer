@@ -4,13 +4,18 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.css.Style;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import org.apache.sanselan.ImageReadException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -19,9 +24,38 @@ public class MainController {
     private TreeTableView<PathItem> dirsTree;
     @FXML
     private ListView ImgList;
-
+    @FXML
+    private Label infoLabel;
+    @FXML public void clickOnImage(MouseEvent arg0) {
+        System.out.println("你点击了 " + ImgList.getSelectionModel().getSelectedItem());
+        ImageView imgView = (ImageView) ImgList.getSelectionModel().getSelectedItem();
+        clickedImgUrl = imgView.getId();
+    }
+    @FXML public void clickOnOpenBtn(MouseEvent arg0) {
+        if(clickedImgUrl != null) {
+            System.out.println("打开图片" + clickedImgUrl);
+            Stage secondStage = new Stage();
+            Label label = new Label("新窗口"); // 放一个标签
+            Image image = new Image(clickedImgUrl,
+                    1280, // requested width
+                    720, // requested height
+                    true, // preserve ratio
+                    true, // smooth rescaling
+                    false // load in background
+            );
+            ImageView imgView = new ImageView();
+            imgView.setImage(image);
+            StackPane secondPane = new StackPane(imgView);
+            Scene secondScene = new Scene(secondPane, 1280, 720);
+            secondStage.setTitle("查看" + clickedImgUrl);
+            secondStage.setScene(secondScene);
+            secondStage.show();
+        } else {
+            System.out.println("未选中任何图片");
+        }
+    }
     public ViewerImageItem ImgItem;
-
+    private String clickedImgUrl;
     public void initialize() {
         ImgItem = new ViewerImageItem();
         initDirsTree();
@@ -69,6 +103,7 @@ public class MainController {
         //为文件夹树设置点击事件：
         dirsTree.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) {
+                ImgList.getItems().clear();
                 TreeItem node = dirsTree.getSelectionModel().getSelectedItem();
                 PathItem item = (PathItem) node.getValue();
                 System.out.println("Node click: " + item.getDirName());
@@ -79,22 +114,32 @@ public class MainController {
                     if (filesList == null || filesList.length == 0) {
                         System.out.println("this is an empty directory.");
                     } else {
-                        Arrays.stream(filesList).map(s -> new PathItem(s.getAbsolutePath())).forEachOrdered(nextDirUnit -> {
+                        for (File s : filesList) {
+                            PathItem nextDirUnit = new PathItem(s.getAbsolutePath());
                             TreeItem nextDirItem = new TreeItem<>(nextDirUnit);
                             if (nextDirUnit.getFile().isDirectory() && nextDirUnit.getFile().list() != null && Objects.requireNonNull(nextDirUnit.getFile().list()).length > 0) { //如果当前添加的叶子文件是非空文件夹，则添加一个空数据作为叶子的叶子，使得用户看到这个文件夹时知道可以继续点击
                                 nextDirItem.getChildren().add(new TreeItem<>(new PathItem(" ")));
                             }
                             node.getChildren().add(nextDirItem);
-                        });
+                            addImgFromFile(s);
+                        }
                     }
-                } else {
-                    ImgItem.setImageFile(item.getFile());
-                    System.out.println(ImgItem.getImageUrl());
-                    addImg(ImgItem);
-                    System.out.println("this a file.");
                 }
             }
         });
+    }
+
+    public void addImgFromFile(File file) {
+        ImgItem.setImageFile(file);
+        System.out.println(ImgItem.getImageUrl());
+        if(ImgItem.isImgFile()) {
+            addImg(ImgItem);
+            infoLabel.setText(ImgItem.getImageInfo());
+            infoLabel.setWrapText(true);
+        }
+        else {
+            System.out.println("该文件不是图片文件");
+        }
     }
 
     public void addImg(ViewerImageItem imgItem) {
@@ -107,6 +152,21 @@ public class MainController {
         );
         ImageView imageView = new ImageView();
         imageView.setImage(image);
+        imageView.setId(imgItem.getImageUrl());
+        /*
+        imageView.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent event){
+                System.out.println(imageView.getId());
+            }
+        });
+        */
         ImgList.getItems().add(imageView);
+        /*
+        ImgList.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent event){
+                System.out.println(imageView.getId());
+            }
+        });
+        */
     }
 }
